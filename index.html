@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Galería de imágenes</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body {
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+        background-color: #222222;
+      }
+
+      .image-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        grid-template-rows: repeat(auto-fill, minmax(200px, 1fr));
+        grid-gap: 10px;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .image-grid img {
+        object-fit: contain;
+        width: 100%;
+        height: 100%;
+        max-height: 100%;
+        max-width: 100%;
+      }
+
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        visibility: hidden;
+        z-index: 1;
+      }
+
+      .modal img {
+        object-fit: contain;
+        width: 100%;
+        height: 100%;
+        max-height: 100%;
+        max-width: 100%;
+      }
+
+      .modal.active {
+        visibility: visible;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="image-grid" class="image-grid"></div>
+
+    <div id="modal" class="modal">
+      <img id="modal-image" src="" alt="" />
+    </div>
+
+    <script>
+      const indexes = [];
+      for (let i = 1; i < 500; i++) {
+        indexes.push(i);
+      }
+      indexes.sort(function () {
+        return Math.random() - 0.5;
+      });
+
+      let imageCounter = 0;
+
+      function loadImages() {
+        const imageGrid = document.getElementById("image-grid");
+
+        for (let idx = 0; idx < 20; idx++) {
+          const i = indexes[imageCounter];
+          const imgElement = document.createElement("img");
+          imgElement.src = `public/imagenes/img_${i}.png`;
+          imgElement.addEventListener("click", () => {
+            const modal = document.getElementById("modal");
+            const modalImage = document.getElementById("modal-image");
+            modalImage.src = imgElement.src;
+            modal.classList.add("active");
+          });
+          imageGrid.appendChild(imgElement);
+          imageCounter++;
+        }
+      }
+
+      loadImages();
+
+      // Infinite scroll
+      window.onscroll = function (event) {
+        if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+          loadImages();
+        }
+      };
+
+      // Close modal when clicking on the background
+      const modal = document.getElementById("modal");
+      modal.addEventListener("click", () => {
+        modal.classList.remove("active");
+      });
+
+      var frameID;
+
+      function autoscroll() {
+        // Obtiene la posición actual de la barra de desplazamiento
+        var currentScroll =
+          document.documentElement.scrollTop || document.body.scrollTop;
+        // Establece una nueva posición para la barra de desplazamiento incrementando en una cantidad fija
+        window.scrollBy(0, 2);
+        // Solicita un nuevo frame para ejecutar la función en el próximo refresh
+        frameID = window.requestAnimationFrame(autoscroll);
+      }
+
+      // Inicia el autoscroll cuando se carga la página
+      window.addEventListener("load", function () {
+        frameID = window.requestAnimationFrame(autoscroll);
+        setInterval(() => {
+          autoscroll();
+        }, 50);
+      });
+
+      // Detiene el autoscroll cuando el usuario hace scroll manualmente en la página
+      window.addEventListener("scroll", function () {
+        window.cancelAnimationFrame(frameID);
+      });
+    </script>
+  </body>
+</html>
